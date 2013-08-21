@@ -87,7 +87,7 @@ def prompt(data, targetSock, targetName):
     elif (decision == "E"):
         edit(data, targetSock, targetName)
     elif (decision == "D"):
-        print "dropped" 
+        print "\033[0;31mdropped\033[0m" 
         return False 
     elif (decision == "Q"):
         close(None, None)
@@ -97,13 +97,14 @@ def prompt(data, targetSock, targetName):
     return True
 
 def forward(data, targetSock):
-    print "forwarded"
+    print "\033[0;32mforwarded\033[0m"
     targetSock.send(data)
 
 def edit(data, targetSock, targetName):
     """ opens up user's editor and allows them edit the payload in 'pretty hex' 
     syntax  """
 
+    print "\033[0;33mediting\033[0m"
     # write contents to a temporary file in tmp"
     filename = "binterceptor-" + str(time.time())
     file = open(filename, "w")
