@@ -2,12 +2,13 @@
 
 import socket
 import converter
+import time
+import os
 
 def main():
 
     # read from config and get port
     # if not set default to 13074
-    
     sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sockfd.bind(("0.0.0.0", 13074))
     sockfd.listen(1)
@@ -16,7 +17,6 @@ def main():
 
     # read from config and get forward
     # target and port
-
     server = socket.create_connection(("www.google.com", 80)) 
     interceptionLoop(client, server)
 
@@ -35,10 +35,11 @@ def interceptionLoop(clientSock, serverSock):
         # edit, forward, or drop?
 
 def prompt(data, targetSock, targetName):
-    """ prompts user for a decision regarding the data captured returns False if the data was dropped, True otherwise """
+    """ prompts user for a decision regarding the data captured returns False 
+    if the data was dropped, True otherwise """
 
     print "[{}] sending ...".format(targetName)
-    prettyhex = converter.convert(data)
+    prettyhex = converter.convertFromRawPretty(data)
     print prettyhex
 
     decision = raw_input("edit, forward, or drop? [F/e/d] ").upper()
@@ -59,10 +60,20 @@ def forward(data, targetSock):
     targetSock.send(data)
 
 def edit(data, targetSock, targetName):
-    print "edit has been called"
+    """ opens up user's editor and allows them edit the payload in 'pretty hex' 
+    syntax  """
+
     # write contents to a temporary file in tmp"
+    filename = "binterceptor-" + str(time.time())
+    file = open(filename, "w")
+    file.write(converter.convertFromRaw(data))
+    file.close()
     # open up $EDITOR on that file
+    if (os.environ['EDITOR'])
+    os.system("$EDITOR " + filename) #REALLY DANGEROUS!!! ONLY TESTING!!!
     # convert file to binary and prompt new data
-    prompt(data, targetSock, "you")
+    file = open(filename, "r")
+    newdata = converter.convertToRaw(file.read())
+    prompt(newdata, targetSock, "you")
 
 main()
