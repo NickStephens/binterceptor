@@ -131,7 +131,13 @@ def edit(data, targetSock, targetName):
 
     # convert file to binary and prompt new data
     file = open(filename, "r")
-    newdata = converter.convertToRaw(file.read())
+    try:
+        newdata = converter.convertToRaw(file.read())
+    except:
+        print "bad hexadecimal values written, reverting to old data ..."
+        file.close()
+        os.remove(filename)
+        promptAction(data, targetSock, targetName)
     file.close()
     os.remove(filename)
     promptAction(newdata, targetSock, "you as " + targetName)
