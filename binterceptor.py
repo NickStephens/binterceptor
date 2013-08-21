@@ -60,19 +60,30 @@ def interceptionLoop(clientSock, serverSock):
     signal.signal(signal.SIGINT, close)
     while True:
         # cdata = handledRecv(clientSock, 2048)
-        cdata = clientSock.recv(2048)
-        if (not cdata): break
+        if (promptListen()):
+            cdata = clientSock.recv(2048)
+            if (not cdata): break
 
         # if dropped, wait for more client data
-        if (not prompt(cdata, serverSock, "client")):
-            continue
+            promptAction(cdata, serverSock, "client")
+            if (promptListen()):
+                continue
 
         # sdata = handledRecv(serverSock, 2048)
         sdata = serverSock.recv(2048)
         if (not sdata): break
-        prompt(sdata, clientSock, "server")
+        promptAction(sdata, clientSock, "server")
 
-def prompt(data, targetSock, targetName):
+def promptListen():
+    """ prompts the user to decide which host to listen for returns False for server"""
+    decision = raw_input("listen for client or server? [C/s] ").upper()
+    if (decision == "C"):
+        return True
+    elif (decision == "S"):
+        return False
+    return True
+
+def promptAction(data, targetSock, targetName):
     """ prompts user for a decision regarding the data captured returns False 
     if the data was dropped, True otherwise """
 
@@ -80,7 +91,7 @@ def prompt(data, targetSock, targetName):
     prettyhex = converter.convertFromRawPretty(data)
     print prettyhex
 
-    decision = raw_input("edit, forward, drop, or quit? [F/e/d/q] ").upper()
+    decision = raw_input("forward, edit, drop, or quit? [F/e/d/q] ").upper()
 
     if (decision == "F"):
         forward(data, targetSock)
@@ -112,8 +123,9 @@ def edit(data, targetSock, targetName):
     file.close()
 
     # open up $EDITOR on that file
-    editor = os.environ['EDITOR']
-    if (not editor):
+    try:
+        editor = os.environ['EDITOR']
+    except:
         editor = "nano" 
     subprocess.call([editor, filename], shell=False)
 
@@ -122,7 +134,7 @@ def edit(data, targetSock, targetName):
     newdata = converter.convertToRaw(file.read())
     file.close()
     os.remove(filename)
-    prompt(newdata, targetSock, "you as " + targetName)
+    promptAction(newdata, targetSock, "you as " + targetName)
 
 def handledRecv(targetSock, buf):
     try:
