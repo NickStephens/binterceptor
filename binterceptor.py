@@ -6,11 +6,15 @@ import time
 import os
 import subprocess
 import signal
+import errno
 
-# security concerns
-# shell injection at EDITOR openning
+# GLOBAL SOCKET DESCRIPTORS
+client = None
+server = None
 
 def main():
+    global client
+    global server
 
     # read from config and get port
     # if not set default to 13074
@@ -23,21 +27,23 @@ def main():
     # read from config and get forward
     # target and port
     server = socket.create_connection(("www.google.com", 80)) 
+
     interceptionLoop(client, server)
 
 def interceptionLoop(clientSock, serverSock):
     """ the BINTERCEPTOR's dark heart """
+    signal.signal(signal.SIGINT, close)
     while True:
-        cdata = clientSock.recv(2048)
+        cdata = handledRecv(clientSock, 2048)
         if (not cdata): break
-        # edit, forward, or drop? [F/e/d] 
+
+        # if dropped, wait for more client data
         if (not prompt(cdata, serverSock, "client")):
             continue
-        # send to server if forwarded is selected
-        sdata = serverSock.recv(2048)
+
+        sdata = handledRecv(serverSock, 2048)
         if (not sdata): break
         prompt(sdata, clientSock, "server")
-        # edit, forward, or drop?
 
 def prompt(data, targetSock, targetName):
     """ prompts user for a decision regarding the data captured returns False 
@@ -47,7 +53,7 @@ def prompt(data, targetSock, targetName):
     prettyhex = converter.convertFromRawPretty(data)
     print prettyhex
 
-    decision = raw_input("edit, forward, or drop? [F/e/d] ").upper()
+    decision = raw_input("edit, forward, drop, or quit? [F/e/d/q] ").upper()
 
     if (decision == "F"):
         forward(data, targetSock)
@@ -56,6 +62,8 @@ def prompt(data, targetSock, targetName):
     elif (decision == "D"):
         print "dropped" 
         return False 
+    elif (decision == "Q"):
+        close(None, None)
     else:
         forward(data, targetSock)
 
@@ -86,6 +94,22 @@ def edit(data, targetSock, targetName):
     newdata = converter.convertToRaw(file.read())
     file.close()
     os.remove(filename)
-    prompt(newdata, targetSock, "you")
+    prompt(newdata, targetSock, "you as " + targetName)
+
+def handledRecv(targetSock, buf):
+    try:
+        data = targetSock.recv(buf)
+    except socket.error as (code, msg):
+        if code != errno.EINTR:
+            raise
+        else: 
+            close(None, None)
+    return data
+            
+def close(sig, stackframe):
+    print "closing ..."
+    client.close()    
+    server.close()
+    exit(1)
 
 main()
