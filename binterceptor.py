@@ -4,6 +4,7 @@ import socket
 import converter
 import time
 import os
+import subprocess
 
 def main():
 
@@ -52,11 +53,12 @@ def prompt(data, targetSock, targetName):
         print "dropped" 
         return False 
     else:
-        forward(targetSock, data)
+        forward(data, targetSock)
 
     return True
 
 def forward(data, targetSock):
+    print "forwarded"
     targetSock.send(data)
 
 def edit(data, targetSock, targetName):
@@ -68,12 +70,18 @@ def edit(data, targetSock, targetName):
     file = open(filename, "w")
     file.write(converter.convertFromRaw(data))
     file.close()
+
     # open up $EDITOR on that file
-    if (os.environ['EDITOR'])
-    os.system("$EDITOR " + filename) #REALLY DANGEROUS!!! ONLY TESTING!!!
+    editor = os.environ['EDITOR']
+    if (not editor):
+        editor = "nano" 
+    subprocess.call([editor, filename], shell=False)
+
     # convert file to binary and prompt new data
     file = open(filename, "r")
     newdata = converter.convertToRaw(file.read())
+    file.close()
+    os.remove(filename)
     prompt(newdata, targetSock, "you")
 
 main()
