@@ -5,6 +5,10 @@ import converter
 import time
 import os
 import subprocess
+import signal
+
+# security concerns
+# shell injection at EDITOR openning
 
 def main():
 
@@ -14,7 +18,7 @@ def main():
     sockfd.bind(("0.0.0.0", 13074))
     sockfd.listen(1)
     client, desc = sockfd.accept()
-    print "Incoming clientection from", desc 
+    print "Incoming connection from", desc 
 
     # read from config and get forward
     # target and port
