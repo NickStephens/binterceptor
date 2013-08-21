@@ -43,7 +43,7 @@ def prompt(data, targetSock, targetName):
     """ prompts user for a decision regarding the data captured returns False 
     if the data was dropped, True otherwise """
 
-    print "[{}] sending ...".format(targetName)
+    print "[{}] want(s) to send ...".format(targetName)
     prettyhex = converter.convertFromRawPretty(data)
     print prettyhex
 
