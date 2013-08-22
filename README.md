@@ -2,7 +2,7 @@ binterceptor
 ------------
 (binary interceptor)
 
-Binterceptor is a hacky proxy built for analyzing binary network protocols. It allows the operator intercept data as it passes through their machine. Once the data is intercepted the operator has the ability to "forward", "edit", or "drop" the data.
+Binterceptor is a hacky proxy built for analyzing binary network protocols. It allows the operator to intercept data as it passes through their machine. Once the data is intercepted the operator has the ability to "forward", "edit", or "drop" the data.
 
 * __forward__: send the data directly to the host specified on the commandline
 * __edit__: modify the data contained in the intercepted packet using $EDITOR (or nano). The data is presented just as ascii data, and behaves how you would expect a hexeditor to.
