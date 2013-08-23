@@ -46,12 +46,14 @@ def main():
         sys.exit(1)
             
     sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sockfd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sockfd.bind(("0.0.0.0", int(lport)))
     sockfd.listen(1)
     client, desc = sockfd.accept()
     print "Incoming connection from", desc 
 
     server = socket.create_connection((rhost, int(rport))) 
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     interceptionLoop(client, server)
 
