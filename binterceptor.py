@@ -128,7 +128,7 @@ def edit(data, targetSock, targetName):
     try:
         editor = os.environ['EDITOR']
     except:
-        editor = "nano" 
+        editor = "vi" 
     subprocess.call([editor, filename], shell=False)
 
     # convert file to binary and prompt new data
