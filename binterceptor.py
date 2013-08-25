@@ -1,14 +1,11 @@
 #!/usr/bin/python
 
-import getopt
-import socket
-import converter
-import time
-import os
-import subprocess
-import signal
-import errno
+"""binterceptor is a intercepting proxy specializing in binary network
+ protocols """
+
 from sys import argv, exit
+import getopt, socket, time, os, subprocess, signal
+import converter
 
 # GLOBAL SOCKET DESCRIPTORS
 client = None
