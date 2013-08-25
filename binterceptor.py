@@ -5,7 +5,7 @@
 
 from sys import argv, exit
 import getopt, socket, time, os, subprocess, signal
-import converter
+import binterceptor.converter as converter
 
 # GLOBAL SOCKET DESCRIPTORS
 client = None
