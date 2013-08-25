@@ -147,16 +147,6 @@ def edit(data, targetSock, targetName):
     os.remove(filename)
     promptAction(newdata, targetSock, "you as " + targetName)
 
-def handledRecv(targetSock, buf):
-    try:
-        data = targetSock.recv(buf)
-    except socket.error as (code, msg):
-        if code != errno.EINTR:
-            raise
-        else: 
-            close(None, None)
-    return data
-
 def usage():
     print """
     usage: binterceptor [-l listenport] FORWARDHOST FORWARDPORT
