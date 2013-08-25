@@ -5,10 +5,10 @@ import socket
 import converter
 import time
 import os
-import sys
 import subprocess
 import signal
 import errno
+from sys import argv, exit
 
 # GLOBAL SOCKET DESCRIPTORS
 client = None
@@ -23,27 +23,30 @@ def main():
     lport = "13074"
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "l:f:p:h", ["listen=",
-        "forward-host=","forward-port=", "help"])
+        opts, args = getopt.getopt(argv[1:], "l:h", ["listen=",
+        "help"])
     except getopt.GetoptError as err:
         print str(err) 
         usage()
-        sys.exit(1)
+        exit(1)
     for o, a in opts:
         if o in ("-l", "--listen"):
             lport = a
-        elif o in ("-f", "--forward-host"):
-            rhost = a
-        elif o in ("-p", "--forward-port"):
-            rport = a
         elif o in ("-h", "--help"):
             usage()
-            sys.exit(1)
+            exit(1)
+
+    if len (opts) == 0 and len(argv) == 4:
+        rhost = argv[2]
+        rport = argv[3]
+    elif len(argv) == 5:
+        rhost = argv[3]
+        rport = argv[4]
 
     if rhost == None or rport == None:
         print "Forward host or forward port not set"
         usage()
-        sys.exit(1)
+        exit(1)
             
     sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sockfd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -156,7 +159,7 @@ def handledRecv(targetSock, buf):
 
 def usage():
     print """
-    usage: binterceptor -l [listenport] -f [forwardhost] -p [forwardport]
+    usage: binterceptor [-l listenport] FORWARDHOST FORWARDPORT
     
     options:
     -h, --help          print this message
@@ -169,7 +172,7 @@ def close(sig, stackframe):
     print "closing ..."
     client.close()    
     server.close()
-    sys.exit(2)
+    exit(2)
 
 if __name__ == "__main__":
     main()
