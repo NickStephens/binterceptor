@@ -29,11 +29,13 @@ def convertFromRawPretty(data):
   
     current = data[:LINEBREAK]
     next = data[LINEBREAK:]
+    offset = 0
     while (current):
         pad = LINEBREAK - len(current)
-        result += convertToHex(current) + (pad * "   ") + "\t| " + convertToAscii(current) + (pad * " ") + " |\n" 
+        result += "{:04d} ".format(offset * LINEBREAK) + convertToHex(current) + (pad * "   ") + "\t| " + convertToAscii(current) + (pad * " ") + " |\n" 
         current = next[:LINEBREAK]
         next = next[LINEBREAK:]
+        offset += 1
 
     return result
 
